@@ -130,7 +130,9 @@
                                         @php
                                             $isLate = now()->greaterThan($peminjaman->tanggal_pengembalian_rencana);
                                             $daysLate = $isLate
-                                                ? now()->diffInDays($peminjaman->tanggal_pengembalian_rencana)
+                                                ? abs(
+                                                    (int) now()->diffInDays($peminjaman->tanggal_pengembalian_rencana),
+                                                )
                                                 : 0;
                                         @endphp
                                         <tr class="hover:bg-gray-50 transition-colors">
@@ -163,11 +165,11 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if ($isLate)
                                                     <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white">Terlambat
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-linear-to-r from-red-500 to-red-600 text-white">Terlambat
                                                         {{ $daysLate }} hari</span>
                                                 @else
                                                     <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white">Tepat
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-linear-to-r from-green-500 to-green-600 text-white">Tepat
                                                         Waktu</span>
                                                 @endif
                                             </td>
@@ -264,7 +266,7 @@
                                                         };
                                                     @endphp
                                                     <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r {{ $badgeClass }} text-white">
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-linear-to-r {{ $badgeClass }} text-white">
                                                         {{ ucwords(str_replace('_', ' ', $kondisi)) }}
                                                     </span>
                                                 @else
@@ -279,10 +281,10 @@
                                                 @endphp
                                                 @if ($statusValue === 'kembali')
                                                     <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white">Dikembalikan</span>
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-linear-to-r from-green-500 to-green-600 text-white">Dikembalikan</span>
                                                 @elseif($statusValue === 'terlambat')
                                                     <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white">Terlambat</span>
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-linear-to-r from-red-500 to-red-600 text-white">Terlambat</span>
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center">

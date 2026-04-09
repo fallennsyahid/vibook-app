@@ -41,7 +41,7 @@
                     </div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-red-800">
-                            {{ $errors->first('login') ?: $errors->first() }}
+                            {{ $errors->first('email') ?: $errors->first() }}
                         </p>
                     </div>
                     <button type="button"
@@ -78,19 +78,19 @@
             <form method="POST" action="{{ route('login') }}" class="space-y-6">
                 @csrf
 
-                <!-- Email or Username -->
+                <!-- Email -->
                 <div>
-                    <x-input-label for="login" :value="__('Email atau Username')" class="mb-2 sm:mb-3 text-sm sm:text-base" />
+                    <x-input-label for="email" :value="__('Email')" class="mb-2 sm:mb-3 text-sm sm:text-base" />
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-user text-text/50"></i>
+                            <i class="fas fa-envelope text-text/50"></i>
                         </div>
-                        <x-text-input id="login"
+                        <x-text-input id="email"
                             class="block pl-10 pr-10 py-3 sm:py-4 text-lg text-text font-medium rounded-xl w-full border-2 border-text/50 focus:border-primary transition-colors duration-300"
-                            type="text" name="login" :value="old('login')" required autofocus autocomplete="username"
-                            placeholder="Masukkan email atau username anda" />
+                            type="email" name="email" :value="old('email')" required autofocus autocomplete="email"
+                            placeholder="Masukkan email anda" />
                     </div>
-                    <x-input-error :messages="$errors->get('login')" class="mt-2" />
+                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
                 <!-- Password -->

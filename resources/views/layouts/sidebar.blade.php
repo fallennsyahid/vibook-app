@@ -59,7 +59,7 @@
     <div class="flex items-center justify-between py-3 px-6 bg-text/25 rounded-t-xl relative">
         <a href="#"
             class="sidebar-button inline-flex justify-center items-center bg-primary text-white font-bold text-base h-12 w-16 rounded-xl">
-            CMS
+            VAN
         </a>
         <div class="" id="close-sidebar-2">
             <button type="button"

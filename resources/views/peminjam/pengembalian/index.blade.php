@@ -166,7 +166,9 @@
                                             );
                                             $sekarang = \Carbon\Carbon::now();
                                             $isTerlambat = $sekarang->gt($batasKembali);
-                                            $hariTerlambat = $isTerlambat ? $sekarang->diffInDays($batasKembali) : 0;
+                                            $hariTerlambat = $isTerlambat
+                                                ? abs((int) $sekarang->diffInDays($batasKembali))
+                                                : 0;
                                         @endphp
                                         <div
                                             class="{{ $isTerlambat ? 'text-red-600 font-semibold' : 'text-gray-700' }}">
@@ -254,7 +256,7 @@
                                     );
                                     $isTerlambat = $tanggalKembaliSebenarnya->gt($tanggalKembaliRencana);
                                     $hariTerlambat = $isTerlambat
-                                        ? $tanggalKembaliSebenarnya->diffInDays($tanggalKembaliRencana)
+                                        ? abs((int) $tanggalKembaliSebenarnya->diffInDays($tanggalKembaliRencana))
                                         : 0;
                                 @endphp
                                 <tr class="hover:bg-gray-50/80 transition-colors border-b border-gray-100">
