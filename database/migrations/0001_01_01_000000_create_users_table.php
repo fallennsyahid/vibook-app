@@ -14,15 +14,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->uuid('user_id')->unique();
-            $table->string('nama_lengkap');
-            $table->string('username', 50)->unique();
-            $table->string('no_telp', 15)->nullable();
-            $table->string('email')->unique();
+            $table->string('username')->unique();
             $table->string('password');
             $table->enum('role', RolesEnum::getAllRoles())->default(RolesEnum::ADMIN);
-            $table->boolean('status_blokir')->default(false);
-            $table->timestamp('durasi_blokir')->nullable()->comment('Isi tanggal terakhir diblokir');
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();

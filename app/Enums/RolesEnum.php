@@ -5,8 +5,7 @@ namespace App\Enums;
 enum RolesEnum: string
 {
     case ADMIN = "admin";
-    case PETUGAS = "petugas";
-    case PEMINJAM = "peminjam";
+    case SISWA = "siswa";
 
     public static function getAllRoles(): array
     {
