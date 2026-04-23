@@ -4,25 +4,26 @@
     $allMenus = [
         'admin' => [
             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => 'fas fa-table-cells-large'],
-            ['label' => 'Manajemen Alat', 'route' => 'admin.alat.index', 'icon' => 'fas fa-briefcase'],
+            ['label' => 'Manajemen Alat', 'route' => 'admin.buku.index', 'icon' => 'fas fa-briefcase'],
             ['label' => 'Manajemen Kategori', 'route' => 'admin.kategori.index', 'icon' => 'fas fa-tags'],
-            [
-                'label' => 'Akun Pengguna',
-                'icon' => 'fas fa-users',
-                'id' => 'menu-user',
-                'subMenus' => [
-                    [
-                        'label' => 'Manajemen Akun Petugas',
-                        'route' => 'admin.user-petugas.index',
-                        'icon' => 'fas fa-user-tie',
-                    ],
-                    [
-                        'label' => 'Manajemen Akun Peminjam',
-                        'route' => 'admin.user-peminjam.index',
-                        'icon' => 'fas fa-user',
-                    ],
-                ],
-            ],
+            ['label' => 'Manajemen Siswa', 'route' => 'admin.siswa.index', 'icon' => 'fas fa-users'],
+            // [
+            //     'label' => 'Akun Pengguna',
+            //     'icon' => 'fas fa-users',
+            //     'id' => 'menu-user',
+            //     'subMenus' => [
+            //         [
+            //             'label' => 'Manajemen Akun Petugas',
+            //             'route' => 'admin.user-petugas.index',
+            //             'icon' => 'fas fa-user-tie',
+            //         ],
+            //         [
+            //             'label' => 'Manajemen Akun Peminjam',
+            //             'route' => 'admin.user-peminjam.index',
+            //             'icon' => 'fas fa-user',
+            //         ],
+            //     ],
+            // ],
             ['label' => 'Data Peminjaman', 'route' => 'admin.peminjaman.index', 'icon' => 'fas fa-file-invoice'],
             ['label' => 'Data Pengembalian', 'route' => 'admin.pengembalian.index', 'icon' => 'fas fa-rotate-left'],
             ['label' => 'Log Aktifitas', 'route' => 'admin.log.index', 'icon' => 'fas fa-file-alt'],
@@ -41,11 +42,11 @@
                 'icon' => 'fas fa-undo-alt',
             ],
         ],
-        'peminjam' => [
-            ['label' => 'Dashboard', 'route' => 'peminjam.dashboard', 'icon' => 'fas fa-table-cells-large'],
-            ['label' => 'Daftar Alat', 'route' => 'peminjam.alat.index', 'icon' => 'fas fa-briefcase'],
-            ['label' => 'Pengajuan Peminjaman', 'route' => 'peminjam.peminjaman.index', 'icon' => 'fas fa-plus-circle'],
-            ['label' => 'Pengembalian', 'route' => 'peminjam.pengembalian.index', 'icon' => 'fas fa-undo-alt'],
+        'siswa' => [
+            ['label' => 'Dashboard', 'route' => 'siswa.dashboard', 'icon' => 'fas fa-table-cells-large'],
+            ['label' => 'Daftar Buku', 'route' => 'siswa.buku.index', 'icon' => 'fas fa-book'],
+            ['label' => 'Pengajuan Peminjaman', 'route' => 'siswa.peminjaman.index', 'icon' => 'fas fa-plus-circle'],
+            ['label' => 'Pengembalian', 'route' => 'siswa.pengembalian.index', 'icon' => 'fas fa-undo-alt'],
         ],
     ];
 

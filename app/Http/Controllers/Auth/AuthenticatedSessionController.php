@@ -33,8 +33,8 @@ class AuthenticatedSessionController extends Controller
 
         $dashboardRoute = match ($user->role->value) {
             \App\Enums\RolesEnum::ADMIN->value => 'admin.dashboard',
-            \App\Enums\RolesEnum::PETUGAS->value => 'petugas.dashboard',
-            \App\Enums\RolesEnum::PEMINJAM->value => 'peminjam.dashboard',
+            // \App\Enums\RolesEnum::PETUGAS->value => 'petugas.dashboard',
+            \App\Enums\RolesEnum::SISWA->value => 'siswa.dashboard',
             default => 'login',
         };
 

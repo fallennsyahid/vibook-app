@@ -1,6 +1,6 @@
 const openModal = document.querySelector('#open-modal');
-const openModalEdit = document.querySelectorAll('.edit-alat');
-const modalCreate = document.querySelector('#create-new-alat');
+const openModalEdit = document.querySelectorAll('.edit-buku');
+const modalCreate = document.querySelector('#create-new-buku');
 const closeModal = document.querySelectorAll('.close-modal');
 
 // Open create modal
@@ -16,7 +16,7 @@ if (openModal) {
 openModalEdit.forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const modal = document.querySelector('#edit-alat-' + btn.dataset.id);
+        const modal = document.querySelector('#edit-buku-' + btn.dataset.id);
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');

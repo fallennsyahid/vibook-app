@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Peminjam;
+namespace App\Http\Controllers\Siswa;
 
-use App\Models\Alat;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Buku;
 
-class AlatController extends Controller
+class BukuController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $alats = Alat::with('kategori')->paginate(9);
+        $bukus = Buku::with('kategori')->paginate(9);
         $kategoris = Kategori::where('status', 'active')->get();
-        $totalAlat = Alat::count();
-        $alatTersedia = Alat::where('stok', '>', 0)->count();
-        $alatMenipis = Alat::where('stok', '<=', 5)->where('stok', '>', 0)->count();
-        $alatTidakTersedia = Alat::where('stok', '=', 0)->count();
-        return view('peminjam.alat.index', compact('alats', 'kategoris', 'totalAlat', 'alatTersedia', 'alatMenipis', 'alatTidakTersedia'));
+        $totalBuku = Buku::count();
+        $bukuTersedia = Buku::where('stok', '>', 0)->count();
+        $bukuMenipis = Buku::where('stok', '<=', 5)->where('stok', '>', 0)->count();
+        $bukuTidakTersedia = Buku::where('stok', '=', 0)->count();
+        return view('siswa.buku.index', compact('bukus', 'kategoris', 'totalBuku', 'bukuTersedia', 'bukuMenipis', 'bukuTidakTersedia'));
     }
 
     /**

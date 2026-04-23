@@ -25,7 +25,7 @@
                             Total Akun Peminjam
                         </h1>
                         <div class="text-3xl text-primary font-bold">
-                            {{ $totalAkunPeminjam }}
+                            {{ $userSiswa->count() }}
                         </div>
                     </div>
                     <div
@@ -42,7 +42,7 @@
                             Peminjam Aktif
                         </h1>
                         <div class="text-3xl text-green-600 font-bold">
-                            {{ $totalPeminjamActive }}
+                            {{-- {{ $totalPeminjamActive }} --}}
                         </div>
                     </div>
                     <div
@@ -60,7 +60,7 @@
                     Daftar Peminjam
                 </h2>
                 <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
-                    Total: {{ count($userPeminjam) }}
+                    {{-- Total: {{ count($userSiswa) }} --}}
                 </span>
             </div>
 
@@ -86,7 +86,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @foreach ($userPeminjam as $index => $peminjam)
+                        @foreach ($userSiswa as $index => $peminjam)
                             <tr class="hover:bg-gray-50/80 transition-colors">
                                 <td class="px-6 py-4 text-sm text-gray-500 text-center">{{ $index + 1 }}</td>
                                 <td class="px-6 py-4">
@@ -124,11 +124,10 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-center">
+                                {{-- <td class="px-6 py-4 text-center">
                                     <div class="flex justify-center gap-3">
                                         @if ($peminjam->status_akun === 0)
-                                            <form
-                                                action="{{ route('admin.user-peminjam.toggleStatus', $peminjam->id) }}"
+                                            <form action="{{ route('admin.siswa.toggleStatus', $peminjam->id) }}"
                                                 method="POST">
                                                 @csrf
                                                 @method('PATCH')
@@ -139,8 +138,7 @@
                                                 </button>
                                             </form>
                                         @else
-                                            <form
-                                                action="{{ route('admin.user-peminjam.toggleStatus', $peminjam->id) }}"
+                                            <form action="{{ route('admin.siswa.toggleStatus', $peminjam->id) }}"
                                                 method="POST">
                                                 @csrf
                                                 @method('PATCH')
@@ -156,8 +154,8 @@
                                             data-id="{{ $peminjam->id }}" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <form action="{{ route('admin.user-peminjam.destroy', $peminjam->id) }}"
-                                            method="POST" class="delete-form inline">
+                                        <form action="{{ route('admin.siswa.destroy', $peminjam->id) }}" method="POST"
+                                            class="delete-form inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -167,7 +165,7 @@
                                             </button>
                                         </form>
                                     </div>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>
@@ -199,7 +197,7 @@
         </div>
 
         <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
-            <form action="{{ route('admin.user-peminjam.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.siswa.store') }}" method="POST" class="space-y-6">
                 @csrf
 
                 <div class="group">
@@ -250,7 +248,7 @@
     </div>
 </div>
 
-@foreach ($userPeminjam as $peminjam)
+@foreach ($userSiswa as $peminjam)
     <div id="edit-peminjam-{{ $peminjam->id }}"
         class="fixed inset-0 z-99999 hidden items-center justify-center p-4 animate-fade-in">
         <div class="close-modal absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
@@ -274,8 +272,7 @@
             </div>
 
             <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
-                <form action="{{ route('admin.user-peminjam.update', $peminjam->id) }}" method="POST"
-                    class="space-y-6">
+                <form action="{{ route('admin.siswa.update', $peminjam->id) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')
 
@@ -378,4 +375,4 @@
     });
 </script>
 
-<script src="{{ asset('asset-admin/js/user-peminjam/index.js') }}"></script>
+<script src="{{ asset('asset-admin/js/siswa/index.js') }}"></script>

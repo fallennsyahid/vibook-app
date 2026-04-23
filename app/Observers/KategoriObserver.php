@@ -14,7 +14,8 @@ class KategoriObserver
     public function created(Kategori $kategori): void
     {
         LogAktivitas::create([
-            'user_id' => Auth::user()?->user_id,
+            // 'user_id' => Auth::user()?->user_id,
+            'user_id' => Auth::user(),
             'aksi' => 'create',
             'entitas' => 'kategori',
             'keterangan_dan_detail' => json_encode([

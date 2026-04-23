@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('password');
-            $table->enum('role', RolesEnum::getAllRoles())->default(RolesEnum::ADMIN);
+            $table->enum('role', RolesEnum::getAllRoles())->default(RolesEnum::SISWA);
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Peminjam;
+namespace App\Http\Controllers\Siswa;
 
 use App\Models\Peminjaman;
 use App\Models\Pengembalian;
@@ -9,7 +9,7 @@ use App\Enums\StatusPeminjaman;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class PengembalianController extends Controller
+class SiswaPengembalianController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,13 +18,13 @@ class PengembalianController extends Controller
     {
         $userId = Auth::user()->user_id;
 
-        $peminjamans = Peminjaman::where('user_id', $userId)
+        $peminjamans = Peminjaman::where('anggota_id', $userId)
             ->where('status', StatusPeminjaman::DIAMBIL->value)
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pengembalians = Pengembalian::whereHas('peminjaman', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('anggota_id', $userId);
         })
             ->with(['peminjaman.details.alat', 'penerima'])
             ->orderBy('created_at', 'desc')
@@ -36,7 +36,7 @@ class PengembalianController extends Controller
             return $pengembalian->tanggal_kembali_sebenarnya > $pengembalian->peminjaman->tanggal_pengembalian_rencana;
         })->count();
 
-        return view('peminjam.pengembalian.index', compact(
+        return view('siswa.pengembalian.index', compact(
             'peminjamans',
             'pengembalians',
             'totalBelumKembali',
@@ -79,11 +79,11 @@ class PengembalianController extends Controller
             ->firstOrFail();
 
         // Pastikan user hanya bisa melihat pengembalian sendiri
-        if ($pengembalian->peminjaman->user_id !== Auth::user()->user_id) {
+        if ($pengembalian->peminjaman->anggota_id !== Auth::user()->user_id) {
             abort(403, 'Unauthorized access');
         }
 
-        return view('peminjam.pengembalian.show', compact('pengembalian'));
+        return view('siswa.pengembalian.show', compact('pengembalian'));
     }
 
     /**

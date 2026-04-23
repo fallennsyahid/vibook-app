@@ -15,8 +15,8 @@ class PeminjamanController extends Controller
     {
         $peminjamans = Peminjaman::with('peminjam')->latest()->paginate(10);
         $totalPeminjaman = Peminjaman::count();
-        $totalPeminjam = Peminjaman::distinct('user_id')->count('user_id');
-        return view('admin.peminjaman.index', compact('peminjamans', 'totalPeminjaman', 'totalPeminjam'));
+        // $totalPeminjam = Peminjaman::distinct('user_id')->count('user_id');
+        return view('admin.peminjaman.index', compact('peminjamans', 'totalPeminjaman'));
     }
 
     /**

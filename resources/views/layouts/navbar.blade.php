@@ -10,13 +10,7 @@
                     {{ ucwords(str_replace(['.', 'index'], [' ', ''], Route::currentRouteName())) }}
                 </h2>
                 <p class="text-sm text-text font-lato">
-                    @if (Auth::user()->role === 'admin')
-                        Kelola Aplikasi Peminjaman Anda
-                    @elseif (Auth::user()->role === 'petugas')
-                        Kelola Arus Masuk dan Keluar Alat
-                    @else
-                        Ajukan Peminjaman Alat dengan Mudah
-                    @endif
+                    {{ Auth::user()->role === 'admin' ? 'Kelola Aplikasi Peminjaman Anda' : 'Ajukan Peminjaman Buku dengan Mudah' }}
                 </p>
             </div>
         </div>
@@ -34,8 +28,9 @@
                 <div class="p-2 rounded-lg hover:bg-text/25 cursor-pointer" id="profile-dropdown">
                     <div class="flex items-center gap-2">
                         @if (Auth::check())
-                            <img src="{{ Avatar::create(Auth::user()->nama_lengkap ?? (Auth::user()->name ?? 'User'))->toBase64() }}"
-                                alt="{{ Auth::user()->nama_lengkap ?? 'Guest' }}" class="rounded-full w-10 h-10">
+                            <img src="{{ Avatar::create(Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User')->toBase64() }}"
+                                alt="{{ Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User' }}"
+                                class="rounded-full w-10 h-10">
                         @else
                             <div class="w-10 h-10 rounded-full bg-bg flex items-end justify-center overflow-hidden">
                                 <i class="fas fa-user text-3xl text-text"></i>
@@ -43,10 +38,10 @@
                         @endif
                         <div class="flex flex-col">
                             <span
-                                class="text-base font-bold text-darkChoco">{{ Auth::check() ? Auth::user()->nama_lengkap : 'Guest' }}</span>
+                                class="text-base font-bold text-darkChoco">{{ Auth::check() ? (Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User') : 'Guest' }}</span>
                             <span class="text-sm font-medium text-text">
                                 <span
-                                    class="text-text font-medium text-sm capitalize">{{ Auth::user()->role ? Auth::user()->role->value : 'Guest' }}</span>
+                                    class="text-text font-medium text-sm capitalize">{{ Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? 'Admin' : 'Siswa' }}</span>
                             </span>
                         </div>
                     </div>
@@ -56,8 +51,9 @@
                     class="absolute top-16 right-0 min-w-72 bg-white rounded-lg border border-text/35 shadow-lg scale-y-0 origin-top transition-all duration-300 ease-in-out overflow-hidden">
                     <div class="flex items-center p-3 gap-4">
                         <div class="relative group w-14 h-14">
-                            <img src="{{ Avatar::create(Auth::user()->nama_lengkap ?? (Auth::user()->name ?? 'User'))->toBase64() }}"
-                                alt="{{ Auth::user()->nama_lengkap }}" class="rounded-full w-14 h-14 object-cover">
+                            <img src="{{ Avatar::create(Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User')->toBase64() }}"
+                                alt="{{ Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User' }}"
+                                class="rounded-full w-14 h-14 object-cover">
 
                             <div class="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
                                 onclick="document.getElementById('profileInput').click()">
@@ -74,8 +70,10 @@
                             </form>
                         </div>
                         <div class="flex flex-col">
-                            <h1 class="text-base text-darkChoco font-bold">{{ Auth::user()->nama_lengkap }}</h1>
-                            <h2 class="text-sm font-medium text-text">{{ Auth::user()->email }}</h2>
+                            <h1 class="text-base text-darkChoco font-bold">
+                                {{ Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User' }}
+                            </h1>
+                            <h2 class="text-sm font-medium text-text capitalize">{{ Auth::user()->role }}</h2>
                         </div>
                     </div>
 

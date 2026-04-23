@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="text-2xl text-primary mt-1 font-bold">
-                    {{ $totalPeminjam }}
+                    {{-- {{ $totalPeminjam }} --}}
                 </div>
             </div>
         </div>

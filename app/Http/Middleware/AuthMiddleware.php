@@ -49,8 +49,8 @@ class AuthMiddleware
     {
         return match ($role) {
             RolesEnum::ADMIN->value => 'admin.dashboard',
-            RolesEnum::PETUGAS->value => 'petugas.dashboard',
-            RolesEnum::PEMINJAM->value => 'peminjam.dashboard',
+            // RolesEnum::PETUGAS->value => 'petugas.dashboard',
+            RolesEnum::SISWA->value => 'siswa.dashboard',
             default => 'login',
         };
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Peminjam;
+namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,11 +8,12 @@ use App\Models\Peminjaman;
 use App\Models\PeminjamanDetail;
 use App\Models\Alat;
 use App\Enums\StatusPeminjaman;
+use App\Models\Buku;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class PeminjamanController extends Controller
+class SiswaPeminjamanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +22,7 @@ class PeminjamanController extends Controller
     {
         $userId = Auth::user()->user_id;
 
-        $peminjamans = Peminjaman::where('user_id', $userId)
+        $peminjamans = Peminjaman::where('anggota_id', $userId)
             ->with(['details.alat', 'pemberi_izin'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -33,15 +34,15 @@ class PeminjamanController extends Controller
         $pengajuanDitolak = $peminjamans->where('status', StatusPeminjaman::DITOLAK->value)->count();
 
         // Ambil semua alat untuk form
-        $alats = Alat::with('kategori')->where('stok', '>', 0)->get();
+        $bukus = Buku::with('kategori')->where('stok', '>', 0)->get();
 
-        return view('peminjam.peminjaman.index', compact(
+        return view('siswa.peminjaman.index', compact(
             'peminjamans',
             'totalPengajuan',
             'pengajuanDisetujui',
             'pengajuanPending',
             'pengajuanDitolak',
-            'alats'
+            'bukus'
         ));
     }
 
@@ -93,7 +94,7 @@ class PeminjamanController extends Controller
 
             // Buat peminjaman
             $peminjaman = Peminjaman::create([
-                'user_id' => Auth::user()->user_id,
+                'anggota_id' => Auth::user()->anggota_id,
                 'tanggal_pengambilan_rencana' => $request->tanggal_pengambilan_rencana,
                 'tanggal_pengembalian_rencana' => $request->tanggal_pengembalian_rencana,
                 'alasan_meminjam' => $request->alasan_meminjam,
@@ -110,7 +111,7 @@ class PeminjamanController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('peminjam.peminjaman.index')
+            return redirect()->route('siswa.peminjaman.index')
                 ->with('success', 'Pengajuan peminjaman berhasil dibuat. Menunggu persetujuan petugas.');
         } catch (\Exception $e) {
             DB::rollback();
@@ -130,7 +131,7 @@ class PeminjamanController extends Controller
             ->firstOrFail();
 
         // Pastikan user hanya bisa melihat peminjaman sendiri
-        if ($peminjaman->user_id !== Auth::user()->user_id) {
+        if ($peminjaman->anggota_id !== Auth::user()->anggota_id) {
             abort(403, 'Unauthorized access');
         }
 
@@ -149,7 +150,7 @@ class PeminjamanController extends Controller
                 ->generate($peminjaman->qr_token));
         }
 
-        return view('peminjam.peminjaman.show', compact('peminjaman', 'qrCode'));
+        return view('siswa.peminjaman.show', compact('peminjaman', 'qrCode'));
     }
 
     /**
@@ -160,7 +161,7 @@ class PeminjamanController extends Controller
         $peminjaman = Peminjaman::where('peminjaman_id', $id)->firstOrFail();
 
         // Pastikan user hanya bisa cancel peminjaman sendiri
-        if ($peminjaman->user_id !== Auth::user()->user_id) {
+        if ($peminjaman->anggota_id !== Auth::user()->anggota_id) {
             abort(403, 'Unauthorized access');
         }
 
@@ -172,7 +173,7 @@ class PeminjamanController extends Controller
 
         $peminjaman->delete();
 
-        return redirect()->route('peminjam.peminjaman.index')
+        return redirect()->route('siswa.peminjaman.index')
             ->with('success', 'Pengajuan peminjaman berhasil dibatalkan.');
     }
 }

@@ -14,7 +14,7 @@ class KategoriController extends Controller
      */
     public function index()
     {
-        $categories = Kategori::withCount('alats')->paginate(9);
+        $categories = Kategori::withCount('bukus')->paginate(9);
         return view('admin.kategori.index', compact('categories'));
     }
 

@@ -9,17 +9,15 @@ use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
-class UserPeminjamController extends Controller
+class SiswaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $userPeminjam = User::where('role', 'peminjam')->latest()->get();
-        $totalAkunPeminjam = User::where('role', 'peminjam')->count();
-        $totalPeminjamActive = User::where('role', 'peminjam')->where('status_akun', true)->count();
-        return view('admin.user-peminjam.index', compact('userPeminjam', 'totalAkunPeminjam', 'totalPeminjamActive'));
+        $userSiswa = User::where('role', 'siswa')->latest()->get();
+        return view('admin.siswa.index', compact('userSiswa'));
     }
 
     /**
