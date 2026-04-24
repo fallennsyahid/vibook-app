@@ -8,7 +8,7 @@
 
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 ">
             <div class="bg-white shadow-md p-4 rounded-xl geometric-shape hover:shadow-lg">
                 <div class="flex flex-row justify-between items-center space-y-0 pb-2">
                     <h1 class="text-sm font-medium text-text">
@@ -19,20 +19,46 @@
                     </div>
                 </div>
                 <div class="text-2xl text-primary mt-1 font-bold">
-                    {{ $totalPeminjaman }}
+                    {{ $totalPeminjaman ?? '-' }}
                 </div>
             </div>
             <div class="bg-white shadow-md p-4 rounded-xl geometric-shape hover:shadow-lg">
                 <div class="flex flex-row justify-between items-center space-y-0 pb-2">
                     <h1 class="text-sm font-medium text-text">
-                        Jumlah Peminjam
+                        Menunggu Persetujuan
+                    </h1>
+                    <div class="w-8 h-8 rounded-lg bg-orange-600 flex justify-center items-center">
+                        <i class="fas fa-clock text-white text-base"></i>
+                    </div>
+                </div>
+                <div class="text-2xl text-primary mt-1 font-bold">
+                    {{ $totalPending ?? '0' }}
+                </div>
+            </div>
+            <div class="bg-white shadow-md p-4 rounded-xl geometric-shape hover:shadow-lg">
+                <div class="flex flex-row justify-between items-center space-y-0 pb-2">
+                    <h1 class="text-sm font-medium text-text">
+                        Disetujui
                     </h1>
                     <div class="w-8 h-8 rounded-lg bg-green-600 flex justify-center items-center">
                         <i class="fas fa-circle-check text-white text-base"></i>
                     </div>
                 </div>
                 <div class="text-2xl text-primary mt-1 font-bold">
-                    {{-- {{ $totalPeminjam }} --}}
+                    {{ $totalDisetujui ?? '0' }}
+                </div>
+            </div>
+            <div class="bg-white shadow-md p-4 rounded-xl geometric-shape hover:shadow-lg">
+                <div class="flex flex-row justify-between items-center space-y-0 pb-2">
+                    <h1 class="text-sm font-medium text-text">
+                        Ditolak
+                    </h1>
+                    <div class="w-8 h-8 rounded-lg bg-red-600 flex justify-center items-center">
+                        <i class="fas fa-times-circle text-white text-base"></i>
+                    </div>
+                </div>
+                <div class="text-2xl text-primary mt-1 font-bold">
+                    {{ $totalDitolak ?? '0' }}
                 </div>
             </div>
         </div>
@@ -58,14 +84,17 @@
                             <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama
                                 Peminjam</th>
                             <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal
-                                Pengajuan</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Alat yang
+                                Pinjam</th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Buku yang
                                 Dipinjam</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal
-                                Rencana</th>
+                            <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Batas
+                                Kembali</th>
                             <th
                                 class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
                                 Status</th>
+                            <th
+                                class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,24 +105,22 @@
                                     <div class="flex items-center gap-2">
                                         <div
                                             class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xs">
-                                            {{-- {{ strtoupper(substr($peminjaman->peminjam->name, 0, 2)) }} --}}
-                                            <img src="{{ Avatar::create($peminjaman->peminjam->name_lengkap ?? ($peminjaman->peminjam->name ?? 'User'))->toBase64() }}"
-                                                alt="{{ $peminjaman->peminjam->name }}" class="rounded-full w-8 h-8">
+                                            <img src="{{ Avatar::create($peminjaman->anggota->nama_anggota ?? 'User')->toBase64() }}"
+                                                alt="{{ $peminjaman->anggota->nama_anggota }}"
+                                                class="rounded-full w-8 h-8">
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">
-                                                {{ $peminjaman->peminjam->name }}</div>
-                                            <div class="text-xs text-gray-500">{{ $peminjaman->peminjam->email }}</div>
+                                                {{ $peminjaman->anggota->nama_anggota ?? 'N/A' }}</div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ $peminjaman->anggota->nis ?? 'N/A' }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-medium text-gray-900">
-                                            {{ \Carbon\Carbon::parse($peminjaman->tanggal_pengajuan)->format('d M Y') }}
-                                        </span>
-                                        <span class="text-xs text-gray-400">
-                                            {{ \Carbon\Carbon::parse($peminjaman->tanggal_pengajuan)->format('H:i') }}
+                                            {{ \Carbon\Carbon::parse($peminjaman->tanggal_pinjam)->format('d M Y') }}
                                         </span>
                                     </div>
                                 </td>
@@ -101,7 +128,7 @@
                                     <div class="flex flex-col gap-1">
                                         @foreach ($peminjaman->details->take(2) as $detail)
                                             <span class="text-sm text-gray-700">
-                                                • {{ $detail->alat->nama_alat }} ({{ $detail->jumlah }}x)
+                                                • {{ $detail->buku->judul_buku }} ({{ $detail->jumlah }}x)
                                             </span>
                                         @endforeach
                                         @if ($peminjaman->details->count() > 2)
@@ -112,70 +139,73 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
-                                        <span class="text-xs text-gray-500">Ambil:</span>
                                         <span
-                                            class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($peminjaman->tanggal_pengambilan_rencana)->format('d M Y') }}</span>
-                                        <span class="text-xs text-gray-500 mt-1">Kembali:</span>
-                                        <span
-                                            class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($peminjaman->tanggal_pengembalian_rencana)->format('d M Y') }}</span>
+                                            class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($peminjaman->tanggal_kembali_rencana)->format('d M Y') }}</span>
                                     </div>
                                 </td>
+                                {{-- <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-700 max-w-xs truncate"
+                                        title="{{ $peminjaman->alasan_meminjamn }}">
+                                        {{ Str::limit($peminjaman->alasan_meminjamn, 30) }}
+                                    </div>
+                                </td> --}}
                                 <td class="px-6 py-4 text-center">
                                     @php
                                         $statusConfig = [
                                             'pending' => [
-                                                'bg' => 'bg-orange-50',
+                                                'bg' => 'bg-orange-100',
                                                 'text' => 'text-orange-700',
-                                                'border' => 'border-orange-100',
-                                                'label' => 'Pending',
+                                                'icon' => 'fa-hourglass-half',
+                                                'label' => 'Menunggu',
                                             ],
                                             'disetujui' => [
-                                                'bg' => 'bg-green-50',
+                                                'bg' => 'bg-green-100',
                                                 'text' => 'text-green-700',
-                                                'border' => 'border-green-100',
+                                                'icon' => 'fa-check-circle',
                                                 'label' => 'Disetujui',
                                             ],
                                             'ditolak' => [
-                                                'bg' => 'bg-red-50',
+                                                'bg' => 'bg-red-100',
                                                 'text' => 'text-red-700',
-                                                'border' => 'border-red-100',
+                                                'icon' => 'fa-times-circle',
                                                 'label' => 'Ditolak',
                                             ],
-                                            'diambil' => [
-                                                'bg' => 'bg-blue-50',
+                                            'dipinjam' => [
+                                                'bg' => 'bg-blue-100',
                                                 'text' => 'text-blue-700',
-                                                'border' => 'border-blue-100',
-                                                'label' => 'Diambil',
+                                                'icon' => 'fa-book',
+                                                'label' => 'Dipinjam',
                                             ],
-                                            'kembali' => [
-                                                'bg' => 'bg-gray-50',
+                                            'dikembalikan' => [
+                                                'bg' => 'bg-gray-100',
                                                 'text' => 'text-gray-700',
-                                                'border' => 'border-gray-100',
-                                                'label' => 'Kembali',
-                                            ],
-                                            'terlambat' => [
-                                                'bg' => 'bg-purple-50',
-                                                'text' => 'text-purple-700',
-                                                'border' => 'border-purple-100',
-                                                'label' => 'Terlambat',
+                                                'icon' => 'fa-undo',
+                                                'label' => 'Dikembalikan',
                                             ],
                                         ];
                                         $status = $statusConfig[$peminjaman->status] ?? $statusConfig['pending'];
                                     @endphp
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium {{ $status['bg'] }} {{ $status['text'] }} border {{ $status['border'] }}">
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ $status['bg'] }} {{ $status['text'] }}">
+                                        <i class="fas {{ $status['icon'] }}"></i>
                                         {{ $status['label'] }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ route('admin.peminjaman.show', $peminjaman->id) }}"
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-eye"></i>
+                                        Lihat
+                                    </a>
                                 </td>
 
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center text-gray-400">
                                         <i class="fas fa-inbox text-4xl mb-3"></i>
                                         <p class="text-lg font-medium">Belum ada pengajuan peminjaman</p>
-                                        <p class="text-sm">Klik tombol "Ajukan Peminjaman Alat" untuk memulai</p>
                                     </div>
                                 </td>
                             </tr>

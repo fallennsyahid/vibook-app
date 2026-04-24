@@ -6,18 +6,15 @@
 @source '../**/*.js';
 
 @theme {
-    --color-primary: #4f46e5;
-    --color-secondary: #06b6d4;
-    --color-third: #8b5cf6;
+    --color-primary: #87a08b;
+    --color-secondary: #e6beae;
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
-    --color-background: #f8fafc;
-    --color-text: #1e293b;
-    --color-heading: #0f172a;
-    --color-darkChoco: #3e2723;
-    --color-section: #f8fafc;
-    --color-accent: #dbeafe;
+    /* --color-background: #f8f5f2; */
+    --color-background: #ebe7e4;
+    --color-text: #3a4031;
+    --color-accent: #6b705c;
 
     --font-family-jakarta: "Plus Jakarta Sans", sans-serif;
     --font-family-satoshi: "Satoshi", sans-serif;

@@ -8,8 +8,13 @@ class PeminjamanDetail extends Model
 {
     protected $fillable = ['peminjaman_id', 'buku_id', 'jumlah'];
 
+    public function peminjaman()
+    {
+        return $this->belongsTo(Peminjaman::class, 'peminjaman_id');
+    }
+
     public function buku()
     {
-        return $this->belongsTo(Buku::class);
+        return $this->belongsTo(Buku::class, 'buku_id');
     }
 }

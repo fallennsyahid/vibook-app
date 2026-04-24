@@ -1,10 +1,10 @@
 <?php
 
 use App\Enums\RolesEnum;
+use App\Http\Controllers\Admin\AdminBukuController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\BukuController as AdminBukuController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\PeminjamanController;
 use App\Http\Controllers\Admin\UserPetugasController;
@@ -52,6 +52,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('/siswa', SiswaController::class);
     // Route::patch('/user-petugas/{id}/toggle-status', [UserPetugasController::class, 'toggleStatus'])->name('admin.user-petugas.toggleStatus');
     Route::resource('/peminjaman', PeminjamanController::class);
+    Route::post('/peminjaman/{id}/approve', [PeminjamanController::class, 'approve'])->name('peminjaman.approve');
+    Route::post('/peminjaman/{id}/reject', [PeminjamanController::class, 'reject'])->name('peminjaman.reject');
     Route::resource('/pengembalian', PengembalianController::class);
     Route::resource('/log', LogAktifitasController::class);
 
@@ -86,6 +88,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
     Route::resource('/buku', BukuController::class);
     Route::resource('/peminjaman', SiswaPeminjamanController::class);
+    Route::post('/peminjaman/{id}/upload-bukti', [SiswaPeminjamanController::class, 'uploadBukti'])->name('peminjaman.uploadBukti');
     Route::resource('/pengembalian', SiswaPengembalianController::class);
 
     // Tambahkan routes peminjam lainnya di sini

@@ -10,7 +10,7 @@
             </div>
             <div class="hidden md:block relative z-10 float-animation">
                 <div class="w-24 h-24 bg-white rounded-full flex justify-center items-center">
-                    <i class="fa-solid fa-rocket text-darkChoco text-5xl"></i>
+                    <i class="fa-solid fa-rocket text-text text-5xl"></i>
                 </div>
             </div>
         </div>

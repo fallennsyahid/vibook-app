@@ -87,9 +87,9 @@
                         @endif
                     </div>
 
-                    @if ($buku->foto_Buku)
+                    @if ($buku->foto_buku)
                         <div class="w-full h-48 overflow-hidden rounded-lg mb-4">
-                            <img src="{{ Storage::url($buku->foto_Buku) }}" alt="{{ $buku->nama_Buku }}"
+                            <img src="{{ Storage::url($buku->foto_buku) }}" alt="{{ $buku->nama_Buku }}"
                                 class="w-full h-full object-cover">
                         </div>
                     @else

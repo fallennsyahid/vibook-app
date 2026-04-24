@@ -14,8 +14,12 @@ class Pengembalian extends Model
         'catatan',
     ];
 
+    protected $casts = [
+        'tanggal_kembali_asli' => 'date',
+    ];
+
     public function peminjaman()
     {
-        return $this->belongsTo(Peminjaman::class);
+        return $this->belongsTo(Peminjaman::class, 'peminjaman_id', 'id');
     }
 }

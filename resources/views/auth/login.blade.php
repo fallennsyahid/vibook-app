@@ -113,7 +113,7 @@
                 </div>
 
                 <!-- Remember + Forgot -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                {{-- <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <label for="remember_me" class="inline-flex items-center">
                         <input id="remember_me" type="checkbox"
                             class="rounded border-gray-300 text-primary shadow-sm w-4 h-4" name="remember">
@@ -125,7 +125,7 @@
                             {{ __('Forgot your password?') }}
                         </a>
                     @endif
-                </div>
+                </div> --}}
 
                 <!-- Button -->
                 <div>
@@ -136,6 +136,15 @@
                     </button>
                 </div>
             </form>
+
+            <div>
+                <p class="mt-6 text-center text-sm text-text">
+                    Belum punya akun?
+                    <a href="{{ route('register') }}" class="text-primary font-medium hover:underline">
+                        Daftar di sini
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 

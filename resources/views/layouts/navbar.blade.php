@@ -1,7 +1,8 @@
-<header class="bg-background shadow-1 border-b border-white/20 mx-4 rounded-2xl fixed top-4 left-0 right-0 z-99">
+<header
+    class="bg-white/40 backdrop-blur-md shadow-1 border-b border-text/10 mx-4 rounded-2xl fixed top-4 left-0 right-0 z-99">
     <div class="flex items-center justify-between py-2 px-6">
         <div class="flex items-center space-x-4">
-            <button class="sidebar-button block lg:hidden hover:bg-white/60 rounded-xl">
+            <button class="sidebar-button block lg:hidden hover:bg-primary/20 rounded-xl">
                 <i class="fas fa-bars"></i>
             </button>
             <div>
@@ -25,7 +26,7 @@
             </div>
 
             <div class="relative">
-                <div class="p-2 rounded-lg hover:bg-text/25 cursor-pointer" id="profile-dropdown">
+                <div class="p-2 rounded-lg hover:bg-primary/20 cursor-pointer" id="profile-dropdown">
                     <div class="flex items-center gap-2">
                         @if (Auth::check())
                             <img src="{{ Avatar::create(Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User')->toBase64() }}"
@@ -38,7 +39,7 @@
                         @endif
                         <div class="flex flex-col">
                             <span
-                                class="text-base font-bold text-darkChoco">{{ Auth::check() ? (Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User') : 'Guest' }}</span>
+                                class="text-base font-bold text-text">{{ Auth::check() ? (Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User') : 'Guest' }}</span>
                             <span class="text-sm font-medium text-text">
                                 <span
                                     class="text-text font-medium text-sm capitalize">{{ Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? 'Admin' : 'Siswa' }}</span>
@@ -48,7 +49,7 @@
                 </div>
 
                 <div id="profile-details"
-                    class="absolute top-16 right-0 min-w-72 bg-white rounded-lg border border-text/35 shadow-lg scale-y-0 origin-top transition-all duration-300 ease-in-out overflow-hidden">
+                    class="absolute top-16 right-0 min-w-72 bg-white rounded-lg border border-text/20 shadow-lg scale-y-0 origin-top transition-all duration-300 ease-in-out overflow-hidden">
                     <div class="flex items-center p-3 gap-4">
                         <div class="relative group w-14 h-14">
                             <img src="{{ Avatar::create(Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User')->toBase64() }}"
@@ -70,18 +71,18 @@
                             </form>
                         </div>
                         <div class="flex flex-col">
-                            <h1 class="text-base text-darkChoco font-bold">
+                            <h1 class="text-base text-primary font-bold">
                                 {{ Auth::user()->role === \App\Enums\RolesEnum::ADMIN ? Auth::user()->username : Auth::user()->anggota?->nama_anggota ?? 'User' }}
                             </h1>
                             <h2 class="text-sm font-medium text-text capitalize">{{ Auth::user()->role }}</h2>
                         </div>
                     </div>
 
-                    <div class="border-t border-text/25">
+                    <div class="border-t border-text/20">
                         <form action="{{ route('logout') }}" method="post" class="logout-form">
                             @csrf
                             <button type="submit"
-                                class="w-full text-left px-4 py-3 hover:bg-text/25 rounded-b-lg flex items-center gap-3 text-red-600 font-medium cursor-pointer">
+                                class="w-full text-left px-4 py-3 hover:bg-danger/20 rounded-b-lg flex items-center gap-3 text-danger font-medium cursor-pointer">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Logout
                             </button>

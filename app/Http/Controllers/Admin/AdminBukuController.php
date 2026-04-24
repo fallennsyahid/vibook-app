@@ -7,8 +7,9 @@ use App\Models\Buku;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
-class BukuController extends Controller
+class AdminBukuController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -37,16 +38,22 @@ class BukuController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_buku' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,kategori_id',
+        $validated = $request->validate([
+            'kategori_id' => 'required|exists:kategoris,id',
+            'judul_buku' => 'required|string|max:255',
+            'penulis' => 'required|string|max:255',
+            'penerbit' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
             'stok' => 'required|integer|min:1',
-            'foto_buku' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_buku' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = [
-            'nama_buku' => $request->nama_buku,
             'kategori_id' => $request->kategori_id,
+            'judul_buku' => $request->judul_buku,
+            'penulis' => $request->penulis,
+            'penerbit' => $request->penerbit,
+            'deskripsi' => $request->deskripsi,
             'stok' => $request->stok,
         ];
 
@@ -54,9 +61,18 @@ class BukuController extends Controller
             $data['foto_buku'] = $request->file('foto_buku')->store('buku-images', 'public');
         }
 
-        Buku::create($data);
-
-        return redirect()->route('admin.buku.index')->with('success', 'Buku berhasil ditambahkan.');
+        try {
+            $buku = Buku::create($data);
+            return redirect()->route('admin.buku.index')->with('success', 'Buku berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            Log::error('Error creating buku:', [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return redirect()->route('admin.buku.index')->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -80,15 +96,21 @@ class BukuController extends Controller
      */
     public function update(Request $request, Buku $buku)
     {
-        $request->validate([
-            'nama_buku' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,kategori_id',
+        $validated = $request->validate([
+            'judul_buku' => 'required|string|max:255',
+            'penulis' => 'required|string|max:255',
+            'penerbit' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'kategori_id' => 'required|exists:kategoris,id',
             'stok' => 'required|integer|min:1',
-            'foto_buku' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_buku' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = [
-            'nama_buku' => $request->nama_buku,
+            'judul_buku' => $request->judul_buku,
+            'penulis' => $request->penulis,
+            'penerbit' => $request->penerbit,
+            'deskripsi' => $request->deskripsi,
             'kategori_id' => $request->kategori_id,
             'stok' => $request->stok,
         ];
@@ -101,9 +123,18 @@ class BukuController extends Controller
             $data['foto_buku'] = $request->file('foto_buku')->store('buku-images', 'public');
         }
 
-        $buku->update($data);
-
-        return redirect()->route('admin.buku.index')->with('success', 'Buku berhasil diperbarui.');
+        try {
+            $buku->update($data);
+            return redirect()->route('admin.buku.index')->with('success', 'Buku berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Error updating buku:', [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return redirect()->route('admin.buku.index')->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 
     /**

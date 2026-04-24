@@ -18,18 +18,18 @@ class Peminjaman extends Model
         'note',
     ];
 
+    protected $casts = [
+        'tanggal_pinjam' => 'date',
+        'tanggal_kembali_rencana' => 'date',
+    ];
+
     public function details()
     {
-        return $this->hasMany(PeminjamanDetail::class);
-    }
-
-    public function pengembalian()
-    {
-        return $this->hasOne(Pengembalian::class);
+        return $this->hasMany(PeminjamanDetail::class, 'peminjaman_id');
     }
 
     public function anggota()
     {
-        return $this->belongsTo(Anggota::class);
+        return $this->belongsTo(Anggota::class, 'anggota_id', 'id');
     }
 }

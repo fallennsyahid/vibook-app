@@ -6,12 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\PeminjamanDetail;
-use App\Models\Alat;
-use App\Enums\StatusPeminjaman;
 use App\Models\Buku;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SiswaPeminjamanController extends Controller
 {
@@ -20,20 +17,24 @@ class SiswaPeminjamanController extends Controller
      */
     public function index()
     {
-        $userId = Auth::user()->user_id;
+        $anggota = Auth::user()->anggota;
 
-        $peminjamans = Peminjaman::where('anggota_id', $userId)
-            ->with(['details.alat', 'pemberi_izin'])
+        if (!$anggota) {
+            return redirect()->back()->with('error', 'Data anggota tidak ditemukan.');
+        }
+
+        $peminjamans = Peminjaman::where('anggota_id', $anggota->id)
+            ->with('details')
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Hitung statistik
         $totalPengajuan = $peminjamans->count();
-        $pengajuanDisetujui = $peminjamans->where('status', StatusPeminjaman::DISETUJUI->value)->count();
-        $pengajuanPending = $peminjamans->where('status', StatusPeminjaman::PENDING->value)->count();
-        $pengajuanDitolak = $peminjamans->where('status', StatusPeminjaman::DITOLAK->value)->count();
+        $pengajuanDisetujui = $peminjamans->where('status', 'disetujui')->count();
+        $pengajuanPending = $peminjamans->where('status', 'pending')->count();
+        $pengajuanDitolak = $peminjamans->where('status', 'ditolak')->count();
 
-        // Ambil semua alat untuk form
+        // Ambil semua buku untuk form
         $bukus = Buku::with('kategori')->where('stok', '>', 0)->get();
 
         return view('siswa.peminjaman.index', compact(
@@ -52,60 +53,60 @@ class SiswaPeminjamanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tanggal_pengambilan_rencana' => 'required|date|after:today',
-            'tanggal_pengembalian_rencana' => 'required|date|after:tanggal_pengambilan_rencana',
-            'alasan_meminjam' => 'required|string|min:10',
-            'alat' => 'required|array|min:1',
-            'alat.*.alat_id' => 'required|exists:alats,alat_id',
-            'alat.*.jumlah' => 'required|integer|min:1'
+            'tanggal_pinjam' => 'required|date|after_or_equal:today',
+            'tanggal_kembali_rencana' => 'required|date|after:tanggal_pinjam',
+            'alasan_meminjamn' => 'required|string|min:10',
+            'buku' => 'required|array|min:1',
+            'buku.*.buku_id' => 'required|exists:bukus,id',
+            'buku.*.jumlah' => 'required|integer|min:1'
         ], [
-            'tanggal_pengambilan_rencana.required' => 'Tanggal pengambilan harus diisi',
-            'tanggal_pengambilan_rencana.after' => 'Tanggal pengambilan harus setelah hari ini',
-            'tanggal_pengembalian_rencana.required' => 'Tanggal pengembalian harus diisi',
-            'tanggal_pengembalian_rencana.after' => 'Tanggal pengembalian harus setelah tanggal pengambilan',
-            'alasan_meminjam.required' => 'Alasan meminjam harus diisi',
-            'alasan_meminjam.min' => 'Alasan meminjam minimal 10 karakter',
-            'alat.required' => 'Minimal pilih 1 alat',
-            'alat.*.jumlah.min' => 'Jumlah minimal 1'
+            'tanggal_pinjam.required' => 'Tanggal peminjaman harus diisi',
+            'tanggal_pinjam.after_or_equal' => 'Tanggal peminjaman harus hari ini atau setelahnya',
+            'tanggal_kembali_rencana.required' => 'Tanggal pengembalian harus diisi',
+            'tanggal_kembali_rencana.after' => 'Tanggal pengembalian harus setelah tanggal peminjaman',
+            'alasan_meminjamn.required' => 'Alasan meminjam harus diisi',
+            'alasan_meminjamn.min' => 'Alasan meminjam minimal 10 karakter',
+            'buku.required' => 'Minimal pilih 1 buku',
+            'buku.*.jumlah.min' => 'Jumlah minimal 1'
         ]);
 
-        // Check if user is blocked
-        if (Auth::user()->status_blokir) {
-            $durasiBlokir = Auth::user()->durasi_blokir
-                ? \Carbon\Carbon::parse(Auth::user()->durasi_blokir)->format('d M Y, H:i')
-                : 'tidak ditentukan';
+        $anggota = Auth::user()->anggota;
 
-            return redirect()->back()
-                ->with('error', "Akun Anda sedang ditangguhkan hingga {$durasiBlokir} karena keterlambatan pengembalian. Anda tidak dapat mengajukan peminjaman baru.")
-                ->withInput();
+        if (!$anggota) {
+            return redirect()->back()->with('error', 'Data anggota tidak ditemukan.');
         }
 
         DB::beginTransaction();
         try {
             // Cek ketersediaan stok
-            foreach ($request->alat as $item) {
-                $alat = Alat::where('alat_id', $item['alat_id'])->first();
-                if ($alat->stok < $item['jumlah']) {
+            foreach ($request->buku as $item) {
+                $buku = Buku::find($item['buku_id']);
+                if (!$buku) {
                     return redirect()->back()
-                        ->with('error', "Stok {$alat->nama_alat} tidak mencukupi. Stok tersedia: {$alat->stok}")
+                        ->with('error', 'Buku tidak ditemukan.')
+                        ->withInput();
+                }
+                if ($buku->stok < $item['jumlah']) {
+                    return redirect()->back()
+                        ->with('error', "Stok {$buku->judul_buku} tidak mencukupi. Stok tersedia: {$buku->stok}")
                         ->withInput();
                 }
             }
 
             // Buat peminjaman
             $peminjaman = Peminjaman::create([
-                'anggota_id' => Auth::user()->anggota_id,
-                'tanggal_pengambilan_rencana' => $request->tanggal_pengambilan_rencana,
-                'tanggal_pengembalian_rencana' => $request->tanggal_pengembalian_rencana,
-                'alasan_meminjam' => $request->alasan_meminjam,
-                'status' => StatusPeminjaman::PENDING->value
+                'anggota_id' => $anggota->id,
+                'tanggal_pinjam' => $request->tanggal_pinjam,
+                'tanggal_kembali_rencana' => $request->tanggal_kembali_rencana,
+                'alasan_meminjamn' => $request->alasan_meminjamn,
+                'status' => 'pending'
             ]);
 
             // Buat detail peminjaman
-            foreach ($request->alat as $item) {
+            foreach ($request->buku as $item) {
                 PeminjamanDetail::create([
-                    'peminjaman_id' => $peminjaman->peminjaman_id,
-                    'alat_id' => $item['alat_id'],
+                    'peminjaman_id' => $peminjaman->id,
+                    'buku_id' => $item['buku_id'],
                     'jumlah' => $item['jumlah']
                 ]);
             }
@@ -126,31 +127,18 @@ class SiswaPeminjamanController extends Controller
      */
     public function show($id)
     {
-        $peminjaman = Peminjaman::where('peminjaman_id', $id)
-            ->with(['details.alat.kategori', 'peminjam', 'pemberi_izin'])
+        $peminjaman = Peminjaman::where('id', $id)
+            ->with(['details.buku.kategori', 'anggota'])
             ->firstOrFail();
 
+        $anggota = Auth::user()->anggota;
+
         // Pastikan user hanya bisa melihat peminjaman sendiri
-        if ($peminjaman->anggota_id !== Auth::user()->anggota_id) {
+        if ($peminjaman->anggota_id !== $anggota->id) {
             abort(403, 'Unauthorized access');
         }
 
-        // Generate QR Code jika sudah disetujui dan belum ada qr_token
-        if ($peminjaman->status === StatusPeminjaman::DISETUJUI->value && !$peminjaman->qr_token) {
-            $peminjaman->qr_token = \Illuminate\Support\Str::random(32);
-            $peminjaman->save();
-        }
-
-        // Generate QR Code SVG
-        $qrCode = null;
-        if ($peminjaman->qr_token) {
-            $qrCode = base64_encode(QrCode::format('svg')
-                ->size(300)
-                ->errorCorrection('H')
-                ->generate($peminjaman->qr_token));
-        }
-
-        return view('siswa.peminjaman.show', compact('peminjaman', 'qrCode'));
+        return view('siswa.peminjaman.show', compact('peminjaman'));
     }
 
     /**
@@ -158,15 +146,17 @@ class SiswaPeminjamanController extends Controller
      */
     public function destroy($id)
     {
-        $peminjaman = Peminjaman::where('peminjaman_id', $id)->firstOrFail();
+        $peminjaman = Peminjaman::where('id', $id)->firstOrFail();
+
+        $anggota = Auth::user()->anggota;
 
         // Pastikan user hanya bisa cancel peminjaman sendiri
-        if ($peminjaman->anggota_id !== Auth::user()->anggota_id) {
+        if ($peminjaman->anggota_id !== $anggota->id) {
             abort(403, 'Unauthorized access');
         }
 
         // Hanya bisa cancel jika masih pending
-        if ($peminjaman->status !== StatusPeminjaman::PENDING->value) {
+        if ($peminjaman->status !== 'pending') {
             return redirect()->back()
                 ->with('error', 'Hanya peminjaman dengan status pending yang dapat dibatalkan.');
         }
@@ -175,5 +165,61 @@ class SiswaPeminjamanController extends Controller
 
         return redirect()->route('siswa.peminjaman.index')
             ->with('success', 'Pengajuan peminjaman berhasil dibatalkan.');
+    }
+
+    /**
+     * Upload bukti pengambilan - changes status to dipinjam
+     */
+    public function uploadBukti(Request $request, $id)
+    {
+        $request->validate([
+            'bukti_pengambilan' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ], [
+            'bukti_pengambilan.required' => 'Bukti pengambilan harus diunggah',
+            'bukti_pengambilan.image' => 'File harus berupa gambar',
+            'bukti_pengambilan.max' => 'Ukuran gambar maksimal 2MB'
+        ]);
+
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        $anggota = Auth::user()->anggota;
+
+        // Pastikan user hanya bisa upload bukti peminjaman sendiri
+        if ($peminjaman->anggota_id !== $anggota->id) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Hanya bisa upload jika status disetujui
+        if ($peminjaman->status !== 'disetujui') {
+            return redirect()->back()
+                ->with('error', 'Hanya peminjaman yang sudah disetujui yang dapat diunggah buktinya.');
+        }
+
+        // Upload file
+        if ($request->hasFile('bukti_pengambilan')) {
+            // Hapus file lama jika ada
+            if ($peminjaman->bukti_pengambilan) {
+                $oldPath = storage_path('app/public/' . $peminjaman->bukti_pengambilan);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            $file = $request->file('bukti_pengambilan');
+            $filename = 'bukti_pengambilan_' . $peminjaman->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('bukti_pengambilan', $filename, 'public');
+
+            // Update peminjaman
+            $peminjaman->update([
+                'bukti_pengambilan' => $path,
+                'status' => 'dipinjam'
+            ]);
+
+            return redirect()->route('siswa.peminjaman.index')
+                ->with('success', 'Bukti pengambilan berhasil diunggah. Status berubah menjadi Dipinjam.');
+        }
+
+        return redirect()->back()
+            ->with('error', 'Gagal mengunggah bukti pengambilan.');
     }
 }

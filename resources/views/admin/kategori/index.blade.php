@@ -3,7 +3,7 @@
         <div class="flex flex-wrap items-center justify-between mb-4">
             <div class="space-y-2">
                 <h1 class="text-2xl text-heading font-bold">Manajemen Kategori</h1>
-                <p class="text-text font-lato">Kelola Kategori untuk Alat di sini.</p>
+                <p class="text-text font-lato">Kelola Kategori untuk Buku di sini.</p>
             </div>
             <div>
                 <button type="button" id="open-modal"
@@ -83,7 +83,7 @@
                     <i class="fas fa-pen text-3xl"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-white mb-2">Tambah Kategori Baru</h1>
-                <p class="text-white/90 text-base font-lato">Buat kategori baru untuk mitra.</p>
+                <p class="text-white/90 text-base font-lato">Buat kategori baru untuk buku.</p>
             </div>
 
             <button

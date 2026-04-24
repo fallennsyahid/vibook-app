@@ -96,7 +96,7 @@
 
                     @if ($buku->foto_buku)
                         <div class="w-full h-48 overflow-hidden rounded-lg mb-4">
-                            <img src="{{ Storage::url($buku->foto_buku) }}" alt="{{ $buku->nama_buku }}"
+                            <img src="{{ Storage::url($buku->foto_buku) }}" alt="{{ $buku->judul_buku }}"
                                 class="w-full h-full object-cover">
                         </div>
                     @else
@@ -106,33 +106,46 @@
                     @endif
 
                     <div class="flex flex-col">
-                        <h1 class="text-heading font-bold text-xl mb-2 truncate">{{ $buku->nama_buku }}</h1>
+                        <h1 class="text-heading font-bold text-xl mb-2 truncate">{{ $buku->judul_buku }}</h1>
 
-                        <div class="flex flex-col gap-1">
-                            <span class="text-text text-sm opacity-75">
-                                <i class="fas fa-tag mr-2 w-4"></i>
-                                {{ $buku->kategori->nama_kategori ?? 'Tanpa Kategori' }}
-                            </span>
-
-                            <span class="text-text text-sm font-medium">
-                                <i class="fas fa-boxes mr-2 w-4"></i>
-                                Stok: <span
-                                    class="{{ $buku->stok > 10 ? 'text-green-600' : ($buku->stok > 0 ? 'text-orange-600' : 'text-red-600') }} font-bold">
-                                    {{ $buku->stok }} Unit
+                        <div class="flex justify-between items-center">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-text text-sm opacity-75">
+                                    <i class="fas fa-tag mr-2 w-4"></i>
+                                    {{ $buku->kategori->nama_kategori ?? 'Tanpa Kategori' }}
                                 </span>
-                            </span>
+
+                                <span class="text-text text-sm font-medium">
+                                    <i class="fas fa-boxes mr-2 w-4"></i>
+                                    Stok: <span
+                                        class="{{ $buku->stok > 10 ? 'text-green-600' : ($buku->stok > 0 ? 'text-orange-600' : 'text-red-600') }} font-bold">
+                                        {{ $buku->stok }} Unit
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-text text-sm opacity-75">
+                                    <i class="fas fa-user mr-2 w-4"></i>
+                                    {{ $buku->penulis }}
+                                </span>
+
+                                <span class="text-text text-sm font-medium">
+                                    <i class="fas fa-building mr-2 w-4"></i>
+                                    {{ $buku->penerbit }}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="border-t border-text/25 pt-4 mt-4">
                         <div class="flex items-center space-x-3">
-                            <button type="button" data-id="{{ $buku->buku_id }}"
+                            <button type="button" data-id="{{ $buku->id }}"
                                 class="edit-buku flex-1 flex items-center justify-center gap-2 text-white bg-amber-400 px-3 py-2 rounded-lg cursor-pointer hover:bg-amber-500 transition-colors">
                                 <i class="fas fa-edit"></i>
                                 Edit
                             </button>
-                            <form action="{{ route('admin.buku.destroy', $buku->buku_id) }}" method="post"
-                                class="flex-1" onsubmit="return confirm('Apakah Anda yakin ingin menghapus buku ini?')">
+                            <form action="{{ route('admin.buku.destroy', $buku->id) }}" method="post" class="flex-1"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus buku ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
@@ -162,7 +175,7 @@
             <div class="relative z-10">
                 <div
                     class="w-16 h-16 bg-white/20 rounded-full flex justify-center items-center text-white mx-auto mb-4 backdrop-blur-sm">
-                    <i class="fas fa-tools text-3xl"></i>
+                    <i class="fas fa-book text-3xl"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-white mb-2">Tambah Buku Baru</h1>
                 <p class="text-white/90 text-base font-lato">Tambahkan buku baru ke inventaris</p>
@@ -175,18 +188,29 @@
         </div>
 
         <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
+            @if ($errors->any())
+                <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <h3 class="font-bold mb-2">⚠️ Validation Errors:</h3>
+                    <ul class="list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('admin.buku.store') }}" method="POST" enctype="multipart/form-data"
                 class="space-y-6">
                 @csrf
                 <div class="group">
-                    <label for="nama_buku"
+                    <label for="judul_buku"
                         class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
-                        <i class="fas fa-wrench"></i>
-                        Nama Buku <span class="text-red-400">*</span>
+                        <i class="fas fa-book"></i>
+                        Judul Buku <span class="text-red-400">*</span>
                     </label>
-                    <input type="text" id="nama_buku" name="nama_buku" required
+                    <input type="text" id="judul_buku" name="judul_buku" required
                         class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
-                        placeholder="Nama Buku">
+                        placeholder="Judul Buku">
                 </div>
 
                 <div class="group">
@@ -199,20 +223,53 @@
                         class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white cursor-pointer">
                         <option value="" disabled selected>Pilih Kategori</option>
                         @foreach ($kategoris as $kategori)
-                            <option value="{{ $kategori->kategori_id }}">{{ $kategori->nama_kategori }}</option>
+                            <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
                         @endforeach
                     </select>
+                </div>
+
+                <div class="group">
+                    <label for="penulis"
+                        class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
+                        <i class="fas fa-user"></i>
+                        Penulis <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" id="penulis" name="penulis" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
+                        placeholder="Nama Penulis">
+                </div>
+
+                <div class="group">
+                    <label for="penerbit"
+                        class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
+                        <i class="fas fa-building"></i>
+                        Penerbit <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" id="penerbit" name="penerbit" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
+                        placeholder="Nama Penerbit">
+                </div>
+
+                <div class="group">
+                    <label for="deskripsi"
+                        class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
+                        <i class="fas fa-align-left"></i>
+                        Deskripsi <span class="text-red-400">*</span>
+                    </label>
+                    <textarea id="deskripsi" name="deskripsi" required rows="4"
+                        class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
+                        placeholder="Deskripsi Buku"></textarea>
                 </div>
 
                 <div class="group">
                     <label for="stok"
                         class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
                         <i class="fas fa-boxes"></i>
-                        Stok <span class="text-red-400">*</span>
+                        Stok (Minimal 1) <span class="text-red-400">*</span>
                     </label>
                     <input type="number" id="stok" name="stok" required min="1"
                         class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
-                        placeholder="0">
+                        placeholder="1">
                 </div>
 
                 <div class="upload-group">
@@ -281,7 +338,7 @@
 
 {{-- Modal Edit Start --}}
 @foreach ($bukus as $buku)
-    <div id="edit-buku-{{ $buku->buku_id }}"
+    <div id="edit-buku-{{ $buku->id }}"
         class="fixed inset-0 z-99999 hidden items-center justify-center p-4 animate-fade-in">
         <div class="close-modal absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
@@ -304,32 +361,44 @@
             </div>
 
             <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
-                <form action="{{ route('admin.buku.update', $buku->buku_id) }}" method="POST"
+                <!-- DEBUG: Show validation errors if any -->
+                @if ($errors->any())
+                    <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                        <h3 class="font-bold mb-2">⚠️ Validation Errors:</h3>
+                        <ul class="list-disc list-inside text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form action="{{ route('admin.buku.update', $buku->id) }}" method="POST"
                     enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
                     <div class="group">
-                        <label for="nama_buku_{{ $buku->buku_id }}"
+                        <label for="judul_buku_{{ $buku->id }}"
                             class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
-                            <i class="fas fa-wrench"></i>
-                            Nama Buku <span class="text-red-400">*</span>
+                            <i class="fas fa-book"></i>
+                            Judul Buku <span class="text-red-400">*</span>
                         </label>
-                        <input type="text" id="nama_buku_{{ $buku->buku_id }}" name="nama_buku" required
+                        <input type="text" id="judul_buku_{{ $buku->id }}" name="judul_buku" required
                             class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
-                            value="{{ $buku->nama_buku }}" placeholder="Nama Buku">
+                            value="{{ $buku->judul_buku }}" placeholder="Judul Buku">
                     </div>
 
                     <div class="group">
-                        <label for="kategori_id_{{ $buku->buku_id }}"
+                        <label for="kategori_id_{{ $buku->id }}"
                             class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
                             <i class="fas fa-tag"></i>
                             Kategori <span class="text-red-400">*</span>
                         </label>
-                        <select name="kategori_id" id="kategori_id_{{ $buku->buku_id }}" required
+                        <select name="kategori_id" id="kategori_id_{{ $buku->id }}" required
                             class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white cursor-pointer">
                             @foreach ($kategoris as $kategori)
-                                <option value="{{ $kategori->kategori_id }}"
-                                    {{ $kategori->kategori_id === $buku->kategori_id ? 'selected' : '' }}>
+                                <option value="{{ $kategori->id }}"
+                                    {{ $kategori->id === $buku->kategori_id ? 'selected' : '' }}>
                                     {{ $kategori->nama_kategori }}
                                 </option>
                             @endforeach
@@ -337,12 +406,45 @@
                     </div>
 
                     <div class="group">
-                        <label for="stok_{{ $buku->buku_id }}"
+                        <label for="penulis_{{ $buku->id }}"
+                            class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
+                            <i class="fas fa-user"></i>
+                            Penulis <span class="text-red-400">*</span>
+                        </label>
+                        <input type="text" id="penulis_{{ $buku->id }}" name="penulis" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
+                            value="{{ $buku->penulis }}" placeholder="Nama Penulis">
+                    </div>
+
+                    <div class="group">
+                        <label for="penerbit_{{ $buku->id }}"
+                            class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
+                            <i class="fas fa-building"></i>
+                            Penerbit <span class="text-red-400">*</span>
+                        </label>
+                        <input type="text" id="penerbit_{{ $buku->id }}" name="penerbit" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
+                            value="{{ $buku->penerbit }}" placeholder="Nama Penerbit">
+                    </div>
+
+                    <div class="group">
+                        <label for="deskripsi_{{ $buku->id }}"
+                            class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
+                            <i class="fas fa-align-left"></i>
+                            Deskripsi <span class="text-red-400">*</span>
+                        </label>
+                        <textarea id="deskripsi_{{ $buku->id }}" name="deskripsi" required rows="4"
+                            class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
+                            placeholder="Deskripsi Buku">{{ $buku->deskripsi }}</textarea>
+                    </div>
+
+                    <div class="group">
+                        <label for="stok_{{ $buku->id }}"
                             class="flex items-center gap-2 text-sm font-medium text-darkChoco mb-2 group-hover:text-heading transform-colors">
                             <i class="fas fa-boxes"></i>
                             Stok <span class="text-red-400">*</span>
                         </label>
-                        <input type="number" id="stok_{{ $buku->buku_id }}" name="stok" required min="0"
+                        <input type="number" id="stok_{{ $buku->id }}" name="stok" required min="0"
                             class="w-full px-4 py-3 bg-slate-50 border border-text/25 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-200 hover:bg-white"
                             value="{{ $buku->stok }}" placeholder="0">
                     </div>

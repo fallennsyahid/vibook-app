@@ -26,7 +26,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<body class="antialiased min-h-screen bg-linear-to-br from-section via-white to-accent">
+<body class="antialiased min-h-screen bg-linear-to-br from-background via-background to-primary">
 
     @include('layouts.sidebar')
 

@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\RolesEnum;
 use App\Http\Controllers\Controller;
+use App\Models\Anggota;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -29,29 +33,71 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+
         $request->validate([
-            'nama_lengkap' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:50', 'unique:users,username', 'alpha_dash'],
-            'no_telp' => ['nullable', 'string', 'max:15', 'regex:/^[0-9+]+$/'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'nama_anggota' => 'required|string|max:255',
+            'nis' => 'required|string|unique:anggotas,nis',
+            'kelas' => 'required|string',
+            'no_telp' => 'required|string',
+            'alamat' => 'nullable|string',
+            'password'     => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'nama_lengkap' => $request->nama_lengkap,
-            'username' => $request->username,
-            'no_telp' => $request->no_telp,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => \App\Enums\RolesEnum::PEMINJAM, // Default role untuk registrasi baru
-            'status_blokir' => false,
-        ]);
+        return DB::transaction(function () use ($request) {
+            $usernameBase = Str::slug($request->nama_anggota, '_');
+            $username = $usernameBase;
 
-        event(new Registered($user));
+            $count = 1;
+            while (User::where('username', $username)->exists()) {
+                $username = $usernameBase . '-' . $count;
+                $count++;
+            }
 
-        Auth::login($user);
+            $user = User::create([
+                'username' => $username,
+                'password' => Hash::make($request->password),
+                'role' => RolesEnum::SISWA,
+                'is_active' => true,
+            ]);
 
-        // Redirect ke dashboard sesuai role (default: peminjam)
-        return redirect()->route('peminjam.dashboard');
+            Anggota::create([
+                'user_id' => $user->id,
+                'nis' => $request->nis,
+                'nama_anggota' => $request->nama_anggota,
+                'kelas' => $request->kelas,
+                'no_telp' => $request->no_telp,
+                'alamat' => $request->alamat,
+            ]);
+
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            // Redirect ke dashboard siswa sesuai flowchart
+            return redirect(route('login', absolute: false));
+        });
+        // $request->validate([
+        //     'nama_lengkap' => ['required', 'string', 'max:255'],
+        //     'username' => ['required', 'string', 'max:50', 'unique:users,username', 'alpha_dash'],
+        //     'no_telp' => ['nullable', 'string', 'max:15', 'regex:/^[0-9+]+$/'],
+        //     'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+        //     'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        // ]);
+
+        // $user = User::create([
+        //     'nama_lengkap' => $request->nama_lengkap,
+        //     'username' => $request->username,
+        //     'no_telp' => $request->no_telp,
+        //     'email' => $request->email,
+        //     'password' => Hash::make($request->password),
+        //     'role' => \App\Enums\RolesEnum::PEMINJAM, // Default role untuk registrasi baru
+        //     'status_blokir' => false,
+        // ]);
+
+        // event(new Registered($user));
+
+        // Auth::login($user);
+
+        // return redirect()->route('peminjam.dashboard');
     }
 }

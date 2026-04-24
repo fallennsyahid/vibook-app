@@ -215,7 +215,7 @@
                 @if (in_array($peminjaman->status, ['disetujui', 'diambil']) && $qrCode)
                     <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm sticky top-4">
                         <div
-                            class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r {{ $peminjaman->status === 'diambil' ? 'from-blue-500 to-blue-600' : 'from-green-500 to-green-600' }} text-white">
+                            class="px-6 py-4 border-b border-gray-100 bg-linear-to-r {{ $peminjaman->status === 'diambil' ? 'from-blue-500 to-blue-600' : 'from-green-500 to-green-600' }} text-white">
                             <h2 class="text-lg font-semibold flex items-center gap-2">
                                 <i class="fas fa-qrcode"></i>
                                 @if ($peminjaman->status === 'diambil')

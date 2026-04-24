@@ -4,7 +4,7 @@
     $allMenus = [
         'admin' => [
             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => 'fas fa-table-cells-large'],
-            ['label' => 'Manajemen Alat', 'route' => 'admin.buku.index', 'icon' => 'fas fa-briefcase'],
+            ['label' => 'Manajemen Buku', 'route' => 'admin.buku.index', 'icon' => 'fas fa-book'],
             ['label' => 'Manajemen Kategori', 'route' => 'admin.kategori.index', 'icon' => 'fas fa-tags'],
             ['label' => 'Manajemen Siswa', 'route' => 'admin.siswa.index', 'icon' => 'fas fa-users'],
             // [
@@ -55,16 +55,16 @@
 
 <div id="sidebar-overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-40 lg:hidden"></div>
 <div id="sidebar"
-    class="fixed top-28 left-0 lg:left-4 bottom-4 z-50 w-72 bg-white/80 shadow-lg rounded-xl transition-all duration-700 ease-in-out flex flex-col -translate-x-full lg:translate-x-0">
+    class="fixed top-28 left-0 lg:left-4 bottom-4 z-50 w-72 bg-white/40 backdrop-blur-md shadow-lg rounded-xl transition-all duration-700 ease-in-out flex flex-col -translate-x-full lg:translate-x-0">
 
-    <div class="flex items-center justify-between py-3 px-6 bg-text/25 rounded-t-xl relative">
+    <div class="flex items-center justify-between py-3 px-6 bg-primary/15 rounded-t-xl relative">
         <a href="#"
             class="sidebar-button inline-flex justify-center items-center bg-primary text-white font-bold text-base h-12 w-16 rounded-xl">
-            VAN
+            VB
         </a>
         <div class="" id="close-sidebar-2">
             <button type="button"
-                class="sidebar-button w-10 h-10 text-darkChoco hover:bg-white/70 flex justify-center items-center rounded-full cursor-pointer group">
+                class="sidebar-button w-10 h-10 text-text hover:bg-primary/20 flex justify-center items-center rounded-full cursor-pointer group">
                 <i class="fas fa-angles-left text-xl"></i>
             </button>
         </div>
@@ -91,16 +91,16 @@
                     {{-- Menu Standar --}}
                     <a href="{{ route($menu['route']) }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 group
-                    {{ $isActive ? 'bg-linear-to-r from-primary to-secondary text-white shadow-lg scale-105' : 'text-text hover:bg-white/60 hover:shadow-md' }}">
+                    {{ $isActive ? 'bg-linear-to-r from-primary to-secondary text-white shadow-lg scale-105' : 'text-text hover:bg-primary/10 hover:shadow-md hover:text-primary' }}">
                         <i
-                            class="{{ $menu['icon'] }} {{ $isActive ? 'text-white' : 'text-text group-hover:scale-110' }} transition-all"></i>
+                            class="{{ $menu['icon'] }} {{ $isActive ? 'text-white' : 'text-text group-hover:text-primary group-hover:scale-110' }} transition-all"></i>
                         <span class="font-medium pl-2">{{ $menu['label'] }}</span>
                     </a>
                 @else
                     {{-- Menu dengan Submenu (Parent) --}}
                     <button type="button" onclick="toggleSubmenu('{{ $menu['id'] }}')"
                         class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 group
-                    {{ $isSubActive ? 'bg-text/10 text-primary font-bold' : 'text-text hover:bg-white/60' }}">
+                    {{ $isSubActive ? 'bg-primary/15 text-primary font-bold' : 'text-text hover:bg-primary/10' }}">
                         <div class="flex items-center space-x-3">
                             <i
                                 class="{{ $menu['icon'] }} {{ $isSubActive ? 'text-primary' : 'text-text' }} transition-all"></i>
@@ -112,7 +112,7 @@
 
                     {{-- Container Submenu --}}
                     <div id="{{ $menu['id'] }}"
-                        class="{{ $isSubActive ? '' : 'hidden' }} pl-4 mt-2 space-y-2 border-l-2 border-primary/20 ml-6">
+                        class="{{ $isSubActive ? '' : 'hidden' }} pl-4 mt-2 space-y-2 border-l-2 border-primary/30 ml-6">
                         @foreach ($menu['subMenus'] as $sub)
                             @php $subItemActive = request()->routeIs($sub['route']); @endphp
 
@@ -120,11 +120,11 @@
                                 class="flex items-center space-x-3 px-4 py-2 rounded-lg transition-all duration-300 group
                             {{ $subItemActive
                                 ? 'bg-linear-to-r from-primary to-secondary text-white shadow-md'
-                                : 'text-text/70 hover:text-primary hover:bg-white/50' }}">
+                                : 'text-text/70 hover:text-primary hover:bg-primary/10' }}">
 
                                 {{-- Icon Submenu Sekarang Muncul Di Sini --}}
                                 <i
-                                    class="{{ $sub['icon'] }} text-sm {{ $subItemActive ? 'text-white' : 'group-hover:scale-110' }}"></i>
+                                    class="{{ $sub['icon'] }} text-sm {{ $subItemActive ? 'text-white' : 'group-hover:scale-110 text-primary' }}"></i>
 
                                 <span class="text-sm font-medium">
                                     {{ $sub['label'] }}
@@ -137,11 +137,11 @@
         @endforeach
 
         {{-- <div class="absolute bottom-4 w-full right-0"> --}}
-        <hr class="border-gray-200 my-4">
+        <hr class="border-text/20 my-4">
         <form action="{{ route('logout') }}" method="post" class="logout-form">
             @csrf
             <button type="submit"
-                class="w-full flex items-center justify-center gap-2 text-lg px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden bg-red-600 text-white hover:bg-red-600/80 shadow-lg hover:scale-105">
+                class="w-full flex items-center justify-center gap-2 text-lg px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden bg-danger text-white hover:bg-danger/80 shadow-lg hover:scale-105">
                 <i class="fas fa-sign-out-alt"></i>
                 Logout
             </button>

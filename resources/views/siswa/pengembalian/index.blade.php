@@ -3,8 +3,8 @@
     <div class="pt-3">
         <div class="flex flex-wrap items-center justify-between mb-4">
             <div class="space-y-2">
-                <h1 class="text-2xl text-heading font-bold">Data Pengembalian Alat</h1>
-                <p class="text-text font-lato">Lihat status pengembalian alat yang Anda pinjam.</p>
+                <h1 class="text-2xl text-heading font-bold">Data Pengembalian Buku</h1>
+                <p class="text-text font-lato">Lihat status pengembalian buku yang Anda pinjam.</p>
             </div>
         </div>
 
@@ -13,15 +13,12 @@
             <div class="flex items-start">
                 <i class="fas fa-info-circle text-blue-500 text-xl mt-1 mr-3"></i>
                 <div>
-                    <h3 class="text-blue-800 font-bold mb-2">Cara Pengembalian Alat</h3>
+                    <h3 class="text-blue-800 font-bold mb-2">Cara Pengembalian Buku</h3>
                     <ol class="text-blue-700 text-sm space-y-1 list-decimal list-inside">
-                        <li>Datang ke ruang petugas dengan membawa alat yang dipinjam</li>
-                        <li>Tunjukkan <strong>QR Code peminjaman</strong> Anda (dapat dilihat di menu <a
-                                href="{{ route('siswa.peminjaman.index') }}"
-                                class="underline font-semibold">Peminjaman</a>)</li>
-                        <li>Petugas akan melakukan scan QR Code untuk memproses pengembalian</li>
-                        <li>Petugas akan mengecek kondisi alat yang dikembalikan</li>
-                        <li>Pengembalian selesai dan status Anda akan diperbarui</li>
+                        <li>Datang ke ruang petugas dengan membawa buku yang dipinjam</li>
+                        <li>Sebutkan tanggal peminjaman atau nomor peminjaman Anda</li>
+                        <li>Petugas akan mengecek kondisi buku dan mencatat pengembalian Anda</li>
+                        <li>Pengembalian selesai dan status Anda akan diperbarui di halaman ini</li>
                     </ol>
                     <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                         <p class="text-yellow-800 text-xs font-semibold flex items-center gap-2">
@@ -44,7 +41,7 @@
                         <p class="text-red-700 text-sm">
                             Akun Anda ditangguhkan hingga
                             <strong>{{ \Carbon\Carbon::parse(Auth::user()->durasi_blokir)->format('d M Y, H:i') }}</strong>
-                            karena keterlambatan pengembalian alat.
+                            karena keterlambatan pengembalian buku.
                         </p>
                         <p class="text-red-600 text-xs mt-1">
                             Anda tidak dapat mengajukan peminjaman baru selama masa penangguhan.
@@ -98,15 +95,17 @@
         </div>
 
         <!-- Tab Navigation -->
-        <div class="mb-4">
-            <div class="flex border-b border-gray-200">
-                <button onclick="switchTab('belum-kembali')" id="tab-belum-kembali"
-                    class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-primary text-primary">
-                    Belum Dikembalikan ({{ $totalBelumKembali }})
+        <div class="mb-6 border-b border-gray-200">
+            <div class="flex space-x-4">
+                <button
+                    class="tab-btn active px-4 py-2 font-semibold text-gray-700 border-b-2 border-blue-600 text-blue-600"
+                    data-tab="content-belum-kembali">
+                    <i class="fas fa-hourglass-half mr-2"></i>Belum Dikembalikan
                 </button>
-                <button onclick="switchTab('sudah-kembali')" id="tab-sudah-kembali"
-                    class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-                    Riwayat Pengembalian ({{ $totalSudahKembali }})
+                <button
+                    class="tab-btn px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent hover:border-gray-300"
+                    data-tab="content-sudah-kembali">
+                    <i class="fas fa-history mr-2"></i>Riwayat Pengembalian
                 </button>
             </div>
         </div>
@@ -116,8 +115,8 @@
             <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                     <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-box-open text-gray-400"></i>
-                        Alat yang Belum Dikembalikan
+                        <i class="fas fa-clipboard-list text-gray-400"></i>
+                        Daftar Peminjaman Aktif
                     </h2>
                     <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
                         Total: {{ $peminjamans->count() }}
@@ -132,8 +131,8 @@
                                     class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
                                     No</th>
                                 <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                    Tanggal Diambil</th>
-                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Alat
+                                    Tanggal Dipinjam</th>
+                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Buku
                                     yang Dipinjam</th>
                                 <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Batas
                                     Pengembalian</th>
@@ -144,32 +143,28 @@
                         </thead>
                         <tbody>
                             @forelse ($peminjamans as $index => $peminjaman)
+                                @php
+                                    $batasKembali = \Carbon\Carbon::parse($peminjaman->tanggal_kembali_rencana);
+                                    $sekarang = \Carbon\Carbon::now();
+                                    $isTerlambat = $sekarang->gt($batasKembali);
+                                    $hariTerlambat = $isTerlambat ? abs((int) $sekarang->diffInDays($batasKembali)) : 0;
+                                @endphp
                                 <tr class="hover:bg-gray-50/80 transition-colors border-b border-gray-100">
                                     <td class="px-6 py-4 text-sm text-gray-500 text-center">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ \Carbon\Carbon::parse($peminjaman->tanggal_pengambilan_sebenarnya)->format('d M Y, H:i') }}
+                                        {{ \Carbon\Carbon::parse($peminjaman->tanggal_pinjam)->format('d M Y') }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="space-y-1">
                                             @foreach ($peminjaman->details as $detail)
                                                 <div class="text-sm text-gray-700">
-                                                    <span class="font-medium">{{ $detail->alat->nama_alat }}</span>
+                                                    <span class="font-medium">{{ $detail->buku->judul_buku }}</span>
                                                     <span class="text-gray-500">({{ $detail->jumlah }}x)</span>
                                                 </div>
                                             @endforeach
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
-                                        @php
-                                            $batasKembali = \Carbon\Carbon::parse(
-                                                $peminjaman->tanggal_pengembalian_rencana,
-                                            );
-                                            $sekarang = \Carbon\Carbon::now();
-                                            $isTerlambat = $sekarang->gt($batasKembali);
-                                            $hariTerlambat = $isTerlambat
-                                                ? abs((int) $sekarang->diffInDays($batasKembali))
-                                                : 0;
-                                        @endphp
                                         <div
                                             class="{{ $isTerlambat ? 'text-red-600 font-semibold' : 'text-gray-700' }}">
                                             {{ $batasKembali->format('d M Y') }}
@@ -201,7 +196,7 @@
                                 <tr>
                                     <td colspan="5" class="px-6 py-8 text-center text-gray-500">
                                         <i class="fas fa-check-circle text-4xl mb-2 text-gray-300"></i>
-                                        <p>Semua alat sudah dikembalikan</p>
+                                        <p>Semua buku sudah dikembalikan</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -233,106 +228,76 @@
                                     No</th>
                                 <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     Tanggal Pengembalian</th>
-                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Alat
+                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Buku
                                 </th>
                                 <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     Kondisi</th>
                                 <th
                                     class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
                                     Keterlambatan</th>
-                                <th
-                                    class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                                    Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($pengembalians as $index => $pengembalian)
                                 @php
-                                    $tanggalKembaliSebenarnya = \Carbon\Carbon::parse(
-                                        $pengembalian->tanggal_pengembalian_sebenarnya,
+                                    $batasKembali = \Carbon\Carbon::parse(
+                                        $pengembalian->peminjaman->tanggal_kembali_rencana,
                                     );
-                                    $tanggalKembaliRencana = \Carbon\Carbon::parse(
-                                        $pengembalian->peminjaman->tanggal_pengembalian_rencana,
-                                    );
-                                    $isTerlambat = $tanggalKembaliSebenarnya->gt($tanggalKembaliRencana);
+                                    $tanggalKembaliAsli = \Carbon\Carbon::parse($pengembalian->tanggal_kembali_asli);
+                                    $isTerlambat = $tanggalKembaliAsli->gt($batasKembali);
                                     $hariTerlambat = $isTerlambat
-                                        ? abs((int) $tanggalKembaliSebenarnya->diffInDays($tanggalKembaliRencana))
+                                        ? (int) $batasKembali->diffInDays($tanggalKembaliAsli)
                                         : 0;
                                 @endphp
                                 <tr class="hover:bg-gray-50/80 transition-colors border-b border-gray-100">
                                     <td class="px-6 py-4 text-sm text-gray-500 text-center">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $tanggalKembaliSebenarnya->format('d M Y, H:i') }}
+                                        {{ $tanggalKembaliAsli->format('d M Y') }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="space-y-1">
                                             @foreach ($pengembalian->peminjaman->details as $detail)
                                                 <div class="text-sm text-gray-700">
-                                                    <span class="font-medium">{{ $detail->alat->nama_alat }}</span>
+                                                    <span class="font-medium">{{ $detail->buku->judul_buku }}</span>
                                                     <span class="text-gray-500">({{ $detail->jumlah }}x)</span>
                                                 </div>
                                             @endforeach
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 text-center">
                                         @php
-                                            // Convert enum to string value
-                                            $kondisiValue = is_object($pengembalian->kondisi)
-                                                ? $pengembalian->kondisi->value
-                                                : $pengembalian->kondisi;
-
-                                            $kondisiConfig = [
-                                                'baik' => [
-                                                    'bg' => 'bg-green-100',
-                                                    'text' => 'text-green-700',
-                                                    'icon' => 'fa-check-circle',
-                                                    'label' => 'Baik',
-                                                ],
-                                                'rusak' => [
-                                                    'bg' => 'bg-red-100',
-                                                    'text' => 'text-red-700',
-                                                    'icon' => 'fa-times-circle',
-                                                    'label' => 'Rusak',
-                                                ],
-                                                'tidak_lengkap' => [
-                                                    'bg' => 'bg-orange-100',
-                                                    'text' => 'text-orange-700',
-                                                    'icon' => 'fa-exclamation-triangle',
-                                                    'label' => 'Tidak Lengkap',
-                                                ],
-                                                'hilang' => [
-                                                    'bg' => 'bg-gray-100',
-                                                    'text' => 'text-gray-700',
-                                                    'icon' => 'fa-question-circle',
-                                                    'label' => 'Hilang',
-                                                ],
+                                            $kondisiColors = [
+                                                'baik' => 'bg-green-100 text-green-700',
+                                                'rusak' => 'bg-yellow-100 text-yellow-700',
+                                                'hilang' => 'bg-red-100 text-red-700',
                                             ];
-                                            $kondisi = $kondisiConfig[$kondisiValue] ?? $kondisiConfig['baik'];
+                                            $kondisiIcons = [
+                                                'baik' => 'fa-check-circle',
+                                                'rusak' => 'fa-exclamation-circle',
+                                                'hilang' => 'fa-times-circle',
+                                            ];
                                         @endphp
                                         <span
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium {{ $kondisi['bg'] }} {{ $kondisi['text'] }}">
-                                            <i class="fas {{ $kondisi['icon'] }}"></i>
-                                            {{ $kondisi['label'] }}
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium {{ $kondisiColors[$pengembalian->kondisi] ?? 'bg-gray-100 text-gray-700' }}">
+                                            <i
+                                                class="fas {{ $kondisiIcons[$pengembalian->kondisi] ?? 'fa-question-circle' }}"></i>
+                                            {{ ucfirst($pengembalian->kondisi) }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         @if ($isTerlambat)
                                             <span
                                                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                                <i class="fas fa-clock"></i>
+                                                <i class="fas fa-exclamation-triangle"></i>
                                                 {{ $hariTerlambat }} hari
                                             </span>
                                         @else
-                                            <span class="text-xs text-green-600">
-                                                <i class="fas fa-check"></i> Tepat waktu
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                <i class="fas fa-check-circle"></i>
+                                                Tepat Waktu
                                             </span>
                                         @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <a href="{{ route('peminjam.pengembalian.show', $pengembalian->pengembalian_id) }}"
-                                            class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transition-colors cursor-pointer inline-block">
-                                            <i class="fas fa-eye"></i> Detail
-                                        </a>
                                     </td>
                                 </tr>
                             @empty
@@ -348,31 +313,34 @@
                 </div>
             </div>
         </div>
+
     </div>
 
+    <script>
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+
+                // Remove active state from all buttons
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('text-blue-600', 'border-blue-600');
+                    b.classList.add('text-gray-700', 'border-transparent', 'hover:border-gray-300');
+                });
+
+                // Show selected tab
+                document.getElementById(tabName).classList.remove('hidden');
+
+                // Add active state to clicked button
+                this.classList.remove('text-gray-700', 'border-transparent', 'hover:border-gray-300');
+                this.classList.add('text-blue-600', 'border-blue-600');
+            });
+        });
+    </script>
+
 </x-app-layout>
-
-<script>
-    function switchTab(tabName) {
-        // Hide all tab contents
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.add('hidden');
-        });
-
-        // Remove active class from all tabs
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.classList.remove('border-primary', 'text-primary');
-            button.classList.add('border-transparent', 'text-gray-500');
-        });
-
-        // Show selected tab content
-        document.getElementById(`content-${tabName}`).classList.remove('hidden');
-
-        // Add active class to selected tab
-        const activeTab = document.getElementById(`tab-${tabName}`);
-        activeTab.classList.remove('border-transparent', 'text-gray-500');
-        activeTab.classList.add('border-primary', 'text-primary');
-    }
-</script>
-
-<script src="{{ asset('asset-peminjam/js/index.js') }}"></script>

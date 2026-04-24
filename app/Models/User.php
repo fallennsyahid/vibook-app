@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\RolesEnum;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,16 +19,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'user_id',
-        'nama_lengkap',
         'username',
-        'no_telp',
-        'email',
         'password',
         'role',
-        'status_akun',
-        'status_blokir',
-        'durasi_blokir',
+        'foto_profile',
+        'is_active',
     ];
 
     /**
@@ -59,24 +53,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'status_blokir' => 'boolean',
-            'durasi_blokir' => 'datetime',
+            // 'status_blokir' => 'boolean',
+            // 'durasi_blokir' => 'datetime',
             'role' => RolesEnum::class,
         ];
-    }
-
-    /**
-     * Boot method to auto-generate UUID
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            if (empty($model->user_id)) {
-                $model->user_id = (string) Str::uuid();
-            }
-        });
     }
 
     public function anggota()

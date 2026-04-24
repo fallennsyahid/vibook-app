@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Siswa;
 use App\Models\Peminjaman;
 use App\Models\Pengembalian;
 use Illuminate\Http\Request;
-use App\Enums\StatusPeminjaman;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,24 +15,31 @@ class SiswaPengembalianController extends Controller
      */
     public function index()
     {
-        $userId = Auth::user()->user_id;
+        $anggota = Auth::user()->anggota;
 
-        $peminjamans = Peminjaman::where('anggota_id', $userId)
-            ->where('status', StatusPeminjaman::DIAMBIL->value)
+        if (!$anggota) {
+            return redirect()->back()->with('error', 'Data anggota tidak ditemukan.');
+        }
+
+        // Peminjaman yang belum dikembalikan (status: dipinjam)
+        $peminjamans = Peminjaman::where('anggota_id', $anggota->id)
+            ->where('status', 'dipinjam')
+            ->with('details.buku')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $pengembalians = Pengembalian::whereHas('peminjaman', function ($query) use ($userId) {
-            $query->where('anggota_id', $userId);
+        // Riwayat pengembalian
+        $pengembalians = Pengembalian::whereHas('peminjaman', function ($query) use ($anggota) {
+            $query->where('anggota_id', $anggota->id);
         })
-            ->with(['peminjaman.details.alat', 'penerima'])
+            ->with('peminjaman.details.buku')
             ->orderBy('created_at', 'desc')
             ->get();
 
         $totalBelumKembali = $peminjamans->count();
         $totalSudahKembali = $pengembalians->count();
         $totalTerlambat = $pengembalians->filter(function ($pengembalian) {
-            return $pengembalian->tanggal_kembali_sebenarnya > $pengembalian->peminjaman->tanggal_pengembalian_rencana;
+            return $pengembalian->tanggal_kembali_asli > $pengembalian->peminjaman->tanggal_kembali_rencana;
         })->count();
 
         return view('siswa.pengembalian.index', compact(
@@ -74,12 +80,14 @@ class SiswaPengembalianController extends Controller
      */
     public function edit(string $id)
     {
-        $pengembalian = Pengembalian::where('pengembalian_id', $id)
-            ->with(['peminjaman.details.alat', 'peminjaman.peminjam', 'penerima'])
+        $pengembalian = Pengembalian::where('id', $id)
+            ->with(['peminjaman.details.buku', 'peminjaman.anggota'])
             ->firstOrFail();
 
+        $anggota = Auth::user()->anggota;
+
         // Pastikan user hanya bisa melihat pengembalian sendiri
-        if ($pengembalian->peminjaman->anggota_id !== Auth::user()->user_id) {
+        if ($pengembalian->peminjaman->anggota_id !== $anggota->id) {
             abort(403, 'Unauthorized access');
         }
 

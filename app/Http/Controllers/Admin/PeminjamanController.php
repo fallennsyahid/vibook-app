@@ -13,10 +13,12 @@ class PeminjamanController extends Controller
      */
     public function index()
     {
-        $peminjamans = Peminjaman::with('peminjam')->latest()->paginate(10);
+        $peminjamans = Peminjaman::with('anggota', 'details.buku')->latest()->paginate(10);
         $totalPeminjaman = Peminjaman::count();
-        // $totalPeminjam = Peminjaman::distinct('user_id')->count('user_id');
-        return view('admin.peminjaman.index', compact('peminjamans', 'totalPeminjaman'));
+        $totalPending = Peminjaman::where('status', 'pending')->count();
+        $totalDisetujui = Peminjaman::where('status', 'disetujui')->count();
+        $totalDitolak = Peminjaman::where('status', 'ditolak')->count();
+        return view('admin.peminjaman.index', compact('peminjamans', 'totalPeminjaman', 'totalPending', 'totalDisetujui', 'totalDitolak'));
     }
 
     /**
@@ -40,7 +42,49 @@ class PeminjamanController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $peminjaman = Peminjaman::with('anggota', 'details.buku')->findOrFail($id);
+        return view('admin.peminjaman.show', compact('peminjaman'));
+    }
+
+    /**
+     * Approve peminjaman request.
+     */
+    public function approve(Request $request, string $id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        if ($peminjaman->status !== 'pending') {
+            return redirect()->route('admin.peminjaman.show', $id)->with('error', 'Hanya pengajuan pending yang dapat disetujui.');
+        }
+
+        $peminjaman->update([
+            'status' => 'disetujui',
+        ]);
+
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil disetujui.');
+    }
+
+    /**
+     * Reject peminjaman request.
+     */
+    public function reject(Request $request, string $id)
+    {
+        $request->validate([
+            'note' => 'required|string|min:5',
+        ]);
+
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        if ($peminjaman->status !== 'pending') {
+            return redirect()->route('admin.peminjaman.show', $id)->with('error', 'Hanya pengajuan pending yang dapat ditolak.');
+        }
+
+        $peminjaman->update([
+            'status' => 'ditolak',
+            'note' => $request->note,
+        ]);
+
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil ditolak.');
     }
 
     /**
