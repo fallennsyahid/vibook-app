@@ -36,7 +36,7 @@
 
                     <div class="border-t border-text/25 pt-4">
                         <div class="flex items-center space-x-3">
-                            <form action="{{ route('admin.kategori.toggleStatus', $category->slug) }}" method="POST">
+                            <form action="{{ route('admin.kategori.toggleStatus', $category->id) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit"
@@ -45,12 +45,12 @@
                                     Status
                                 </button>
                             </form>
-                            <button type="button" data-id="{{ $category->slug }}"
+                            <button type="button" data-id="{{ $category->id }}"
                                 class="edit-category flex items-center gap-2 text-white bg-amber-400 px-3 py-1 rounded-lg cursor-pointer hover:bg-amber-500">
                                 <i class="fas fa-edit"></i>
                                 Edit
                             </button>
-                            <form action="{{ route('admin.kategori.destroy', $category->slug) }}" method="post">
+                            <form action="{{ route('admin.kategori.destroy', $category->id) }}" method="post">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
@@ -125,7 +125,7 @@
 </div>
 
 @foreach ($categories as $category)
-    <div id="edit-category-{{ $category->slug }}"
+    <div id="edit-category-{{ $category->id }}"
         class="fixed inset-0 z-99999 hidden items-center justify-center p-4 animate-fade-in">
         <div class="close-modal absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
@@ -148,7 +148,7 @@
             </div>
 
             <div class="p-8 max-h-96 overflow-y-auto custom-scrollbar">
-                <form action="{{ route('admin.kategori.update', $category->slug) }}" method="POST">
+                <form action="{{ route('admin.kategori.update', $category->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="space-y-6">
