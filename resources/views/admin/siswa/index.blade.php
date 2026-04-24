@@ -167,6 +167,16 @@
                                             data-id="{{ $siswa->id }}" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
+                                        <form action="{{ route('admin.admin.siswa.toggleStatus', $siswa->id) }}"
+                                            method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="text-gray-400 hover:text-amber-400 transition-colors"
+                                                title="Ganti Status">
+                                                <i class="fas fa-rotate"></i>
+                                            </button>
+                                        </form>
                                         <form action="{{ route('admin.siswa.destroy', $siswa->id) }}" method="POST"
                                             class="delete-form inline">
                                             @csrf
