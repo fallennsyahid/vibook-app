@@ -172,7 +172,7 @@
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit"
-                                                class="text-gray-400 hover:text-amber-400 transition-colors"
+                                                class="text-gray-400 hover:text-amber-400x` transition-colors"
                                                 title="Ganti Status">
                                                 <i class="fas fa-rotate"></i>
                                             </button>
